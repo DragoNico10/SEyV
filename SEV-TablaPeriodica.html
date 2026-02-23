@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sexualidad, Emociones y Valores</title>
+    <template id="cellT">
+        <style>
+            * {
+                margin: 0;
+            }
+            #cell{
+                border-radius: 1vw;
+                height: 100%;
+                border: 0.2vw inset black;
+                position: relative;
+                color: black;
+            }
+            #cell:has(#focus:hover) #desc{
+                visibility: visible;
+                opacity: 1;
+            }
+            #top{
+                * {
+                    font-size:1vw;
+                    padding-left: 0.5vw;
+                    padding-top: 0.5vw;
+                }
+            }
+            #symbol{
+                display: flex;
+                justify-content: center;
+                * {
+                    font-size: 3vw;
+                }
+            }
+            #name{
+                display: flex;
+                justify-content: center;
+                *{
+                    font-size: 1.2vw;
+                }
+            }
+            #desc{
+                border: 1px solid #999;
+                border-radius: 4px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, .5);
+                background-color: #ffd;
+                color: #222;
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 14px;
+                line-height: normal;
+                padding: 9px;
+                position: absolute;
+                width: 30vw;
+                opacity: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                
+                transition: opacity 0.5s;
+                z-index: 1000;
+                cursor:default;
+            }
+            #desc::after{
+                content: "";
+                position: absolute;
+                border: 1.5vw solid #ffd;
+                left: var(--arrow-offset, 50%);
+                transform:translateX(-50%);
+                width: 0;
+                height: 0;
+                z-index: 1001;
+            }
+            #desc.ptop::after{
+                top: 95%;
+                border-color: #ffd transparent transparent transparent;
+            }
+            #desc.pbot::after{
+                bottom: 95%;
+                border-color: transparent transparent #ffd transparent;
+            }
+            #focus{
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                cursor: help !important;
+                z-index: 1002;
+                top: 0%;
+            }
+        </style>
+        <div id="cell">
+                <div id="top">
+                    <h3 id="num"></h3>
+                </div>
+                <div id="symbol">
+                    <h1 id="sym"></h1>
+                </div>
+                <div id="name">
+                    <h2 id="nam"></h2>
+                </div>
+            <div id="focus"></div>
+            <div id="desc"></div>
+        </div>
+    </template>
+    <script type="module">
+        customElements.define(
+            "sev-cell",
+            class extends HTMLElement {
+                constructor(){
+                    super()
+                    let template = document.getElementById("cellT")
+                    let templateContent= template.content
+
+                    const num = this.getAttribute('num') || 0
+                    const col = this.getAttribute("col") || "default"
+                    const sym = this.getAttribute("sym") || "L"
+                    const nam = this.getAttribute("nam") || "Lorem"
+                    const text = this.innerText || "Ipsum"
+
+                    templateContent.querySelector('#num').innerText = num;
+                    templateContent.querySelector('#cell').style.backgroundColor = `var(--${col})`;
+                    templateContent.querySelector('#sym').innerText = sym;
+                    templateContent.querySelector('#nam').innerText = nam;
+                    templateContent.querySelector('#desc').innerHTML = text;
+
+                    const shadowRoot = this.attachShadow({mode: "open"})
+                    shadowRoot.appendChild(document.importNode(templateContent, true))
+
+                    if(col.substring(0,1)=="m"){
+                        this.shadowRoot.querySelector('#cell').style.color="white"
+                    }
+
+                    this.shadowRoot.querySelector("#focus").addEventListener("mouseenter", ()=>{
+                        const tooltip = this.shadowRoot.querySelector('#desc')
+                        const rect = this.shadowRoot.querySelector('#cell').getBoundingClientRect()
+                        const tipWidth = tooltip.offsetWidth
+                        const vw = window.innerWidth
+                        if (rect.top < 120) {
+                            tooltip.classList.remove('ptop')
+                            tooltip.classList.add('pbot')
+                            tooltip.style.top = '110%'
+                            tooltip.style.bottom = 'auto'
+                        } else {
+                            tooltip.classList.remove('pbot')
+                            tooltip.classList.add('ptop')
+                            tooltip.style.bottom = '110%'
+                            tooltip.style.top = 'auto'
+                        }
+                        let leftOffset = -(tipWidth / 2) + (rect.width / 2)
+                        let expectedLeft = rect.left + leftOffset
+                        let expectedRight = expectedLeft + tipWidth
+
+                        let shift = 0
+                        if (expectedLeft < 10) { 
+                            shift = Math.abs(expectedLeft) + 10
+                        } else if (expectedRight > vw - 10) { 
+                            shift = -(expectedRight - vw + 10)
+                        }
+                        tooltip.style.left = `calc(50% + ${shift}px)`
+                        tooltip.style.transform = `translateX(-50%)`
+                        const arrowPercent = 50 - (shift / tipWidth * 100)
+                        tooltip.style.setProperty('--arrow-offset', `${arrowPercent}%`)
+                    })
+
+                }
+            },
+        )
+    </script>
+    <style>
+        :root{
+            --ml:hotpink;
+            --l:lightpink;
+            --mj:gold;
+            --j:khaki;
+            --msu:orange;
+            --su:peachpuff;
+            --ma:red;
+            --a:lightsalmon;
+            --ms:blue;
+            --s:lightblue;
+            --mf:purple;
+            --f:plum;
+            --md:green;
+            --d:lightgreen;
+            --default:gray;
+            box-sizing: border-box;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+        body{
+            background-color: darkslategray;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            scale: 0.75;
+        }
+        #content {
+            width: 120dvw;
+            height: 60dvw;
+            padding: 2vw;
+            background:
+            radial-gradient(105% 50% at 60% 10%, white, transparent 100%),
+            radial-gradient(20% 20% at 40% 35%, var(--msu), transparent 100%),
+            radial-gradient(20% 60% at 30% 65%, var(--mj), transparent 100%),
+            linear-gradient(90deg,  var(--ml) 0%, transparent 30%),
+            radial-gradient(20% 50% at 50% 60%, var(--ma), transparent 100%),
+            radial-gradient(20% 30% at 95% 70%, var(--md), transparent 100%),
+            radial-gradient(40% 50% at 90% 20%, var(--mf), transparent 100%),
+            radial-gradient(40% 45% at 75% 70%, var(--ms), transparent 100%),
+            radial-gradient(4% 20% at 75% 75%, var(--md), transparent 100%),
+            #7f7f7f;
+            border-radius: 2vw;
+            display: grid;
+            grid-template-columns: repeat(13, 1fr); 
+            grid-template-rows: repeat(7, 1fr);
+            gap: 1vw;
+        }
+        #title{
+            grid-column: span 10;
+            grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            *{
+                margin:0
+            }
+        }
+        #legend{
+            grid-column: span 9;
+            background-color: #fbfbfb66;
+            border: 0.4vw outset gold;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            *{
+                display: flex;
+                align-items: center;
+                div{
+                    width: 2vw;
+                    height: 2vw;
+                    border-radius: 100%;
+                    border: 1px #f0f0f0 solid;
+                }
+                *{
+                    font-size: 2vw;
+                    margin: 0.2vw;
+                    font-weight: bolder;
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="height:100%; display: flex; justify-content: center; align-items: center;">
+        <div id="content">
+            <sev-cell col="ml" num="1" sym="Am" nam="Amor">La fuerza motriz que nos conecta con el prójimo y da sentido a nuestra existencia. Nos impulsa a cuidar, proteger y procurar el bienestar ajeno por encima del propio. Es, en esencia, el vínculo más profundo y transformador de la experiencia humana.</sev-cell>
+            <div id="title">
+                <h1 style="font-size: 4vw; text-align: center; white-space: nowrap;">Sexualidad, Emociones y Valores</h1>
+                <h3 style="font-size: 3vw;">Tabla Periódica</h3>
+            </div>
+            <div></div>
+            <sev-cell col="mf" num="2" sym="Mi" nam="Miedo">Actúa como nuestro instinto de supervivencia más primario, una alarma ineludible ante lo desconocido o peligroso. Nos paraliza o nos prepara para la acción frente a la amenaza inminente. Sin embargo, cuando logramos mirarlo a los ojos y dominarlo, se convierte en el primer paso hacia el verdadero coraje.</sev-cell>
+            <sev-cell col="l" num="3" sym="Em" nam="Empatía">Representa nuestra capacidad de mirarnos en el espejo del otro y comprender genuinamente su dolor o alegría. Es el puente invisible que une las almas y disuelve las duras fronteras del egoísmo. Sin ella, la convivencia pacífica y el progreso social serían ideales inalcanzables.</sev-cell>
+            <sev-cell col="f" num="4" sym="Ne" nam="Nerviosismo">Es esa vibración anticipatoria que recorre el cuerpo cuando enfrentamos un desafío inminente e importante. Nos recuerda que lo que estamos a punto de hacer nos importa profundamente y nos saca de nuestra zona de confort. Es el preludio, a menudo incómodo, de nuestros momentos de mayor crecimiento.</sev-cell>
+            <sev-cell col="f" num="5" sym="Pa" nam="Pavor">Se manifiesta como un miedo intenso y abrumador que nubla la razón y toma control absoluto de los sentidos. Es la sombra más oscura de la incertidumbre, donde la amenaza se percibe como insuperable. Ante él, el espíritu humano se ve obligado a buscar desesperadamente un refugio o una fortaleza interna.</sev-cell>
+            <sev-cell col="l" num="6" sym="Se" nam="Serenidad">Es el estado de equilibrio perfecto donde la mente y el corazón encuentran la paz en medio del caos. Nos permite observar la tormenta exterior sin ser arrastrados por ella, tomando decisiones con una asombrosa claridad. Es un refugio interior que cultivamos con paciencia y sabiduría a lo largo de los años.</sev-cell>
+            <sev-cell col="l" num="7" sym="Te" nam="Ternura">Nace de la delicadeza y el afecto desinteresado hacia lo vulnerable o lo verdaderamente puro. Es una caricia al alma que suaviza las asperezas y durezas de nuestra vida cotidiana. Nos humaniza profundamente al conectarnos con la inocencia y el cuidado compasivo.</sev-cell>
+            <sev-cell col="mj" num="8" sym="Al" nam="Alegría">Es el estallido luminoso del espíritu que celebra el momento presente sin reservas. Nos llena de una energía contagiosa que eleva nuestra perspectiva y aligera nuestras cargas diarias. En su expresión más pura, es la confirmación palpable de que la vida merece ser vivida plenamente.</sev-cell>
+            <sev-cell col="j" num="9" sym="Il" nam="Ilusión">Actúa como el motor inagotable de nuestros sueños, pintando el futuro con los vibrantes colores de la posibilidad. Nos da el empuje necesario para iniciar proyectos y creer fervientemente en lo que aún no existe. Es la chispa de esperanza que precede a toda gran realización humana.</sev-cell>
+            <sev-cell col="msu" num="10" sym="So" nam="Sorpresa">Es la ruptura abrupta de nuestras expectativas establecidas ante la irrupción de lo inesperado. Nos saca momentáneamente de nuestro centro, dejándonos asombrados frente a la abrumadora novedad del mundo. Es un recordatorio humilde de que la vida siempre guarda misterios más allá de nuestra comprensión.</sev-cell>
+            <sev-cell col="su" num="11" sym="In" nam="Interés">Funciona como la brújula de nuestra curiosidad, guiándonos implacablemente hacia el conocimiento y el descubrimiento. Despierta nuestra atención plena y nos motiva a explorar los vastos territorios de lo desconocido. Es el cimiento sobre el cual se construye todo aprendizaje significativo y duradero.</sev-cell>
+            <sev-cell col="a" num="12" sym="Ma" nam="Malhumor">Es esa neblina transitoria que opaca nuestra disposición y nos vuelve reactivos ante los pequeños roces diarios. Suele ser el eco molesto de una incomodidad interna, del cansancio acumulado o de expectativas frustradas. Reconocerlo a tiempo es el primer paso para evitar que tiña injustamente nuestras relaciones.</sev-cell>
+            <sev-cell col="a" num="13" sym="Rb" nam="Rebeldía">Surge como una negación apasionada y vital frente a la injusticia, la imposición arbitraria o el conformismo estéril. Es la fuerza indomable que rompe los moldes y cuestiona el statu quo en busca de auténtica libertad. Bien canalizada, es el motor indispensable de las grandes transformaciones sociales y personales.</sev-cell>
+            <sev-cell col="ms" num="14" sym="Tr" nam="Tristeza">Es el necesario recogimiento del alma ante la pérdida irreparable o el desengaño profundo. Nos obliga a hacer una pausa, a procesar el dolor en silencio y a reevaluar aquello que verdaderamente valoramos. Aunque amarga, es una maestra silenciosa que profundiza nuestra capacidad futura de amar y comprender.</sev-cell>
+            <sev-cell col="s" num="15" sym="Ab" nam="Aburrimiento">Se presenta como la vacuidad del tiempo cuando el entorno no logra estimular nuestra mente inquieta. A menudo lo rehuimos, pero en su quietud se esconde una oportunidad inmensamente valiosa para la introspección. Es el lienzo en blanco que puede dar a luz a nuestra mayor creatividad si sabemos transitarlo con paciencia.</sev-cell>
+            <sev-cell col="f" num="16" sym="Ti" nam="Timidez">Es la reserva prudente del espíritu frente a la mirada inquisidora y el juicio del mundo exterior. Nos envuelve en una cautela que, aunque a veces nos limita, también protege celosamente nuestra vulnerabilidad. Superarla no implica erradicarla, sino aprender a compartir nuestra voz a pesar del temblor.</sev-cell>
+            <sev-cell col="f" num="17" sym="Is" nam="Inseguridad">Susurra dudas hirientes en nuestro interior, haciéndonos cuestionar nuestro propio valor y nuestras legítimas capacidades. Es una sombra engañosa que magnifica nuestros defectos y minimiza nuestras virtudes frente a los grandes retos. Enfrentarla requiere el coraje diario de aceptarnos imperfectos, pero dignos y merecedores de éxito.</sev-cell>
+            <sev-cell col="f" num="18" sym="Ts" nam="Tensión">Es la tirantez emocional y física que acumulamos cuando las presiones del entorno superan nuestros recursos inmediatos. Nos mantiene en un estado de alerta constante, como una cuerda a punto de romperse bajo un gran peso. Aprender a liberarla es una tarea vital para preservar nuestro equilibrio y no quebrar bajo la adversidad.</sev-cell>
+            <sev-cell col="l" num="19" sym="Co" nam="Compasión">Va un paso sublime más allá de la empatía; es el dolor compartido que se transforma en un deseo activo y ferviente de aliviar el sufrimiento ajeno. Nos eleva por encima de nuestros intereses individuales, conectándonos con la fraternidad universal. Es la nobleza del espíritu puesta en acción para sanar el mundo.</sev-cell>
+            <sev-cell col="l" num="20" sym="Cm" nam="Comprensión">Es la luz diáfana que disipa la ignorancia y el juicio apresurado en nuestras relaciones humanas. Surge cuando hacemos el esfuerzo genuino de leer la compleja historia que reside detrás de las acciones de los demás. Nos otorga la sabiduría necesaria para juzgar menos, escuchar más y acoger al otro en su totalidad.</sev-cell>
+            <sev-cell col="j" num="21" sym="Sa" nam="Satisfacción">Es el justo y sereno reposo del guerrero tras haber alcanzado una meta largamente anhelada. Nos inunda de una paz sumamente gratificante, confirmando que nuestro arduo esfuerzo y sacrificio han valido la pena. Es el reconocimiento íntimo del deber cabalmente cumplido y del potencial finalmente realizado.</sev-cell>
+            <sev-cell col="j" num="22" sym="Pl" nam="Placer">Es la gratificación sensorial y emocional que nos ancla profundamente en el gozo del aquí y el ahora. Nos ofrece momentos vitales de respiro, deleite y celebración frente a la innegable dureza del mundo. Disfrutado con equilibrio y conciencia, es un componente esencial de una vida plena, vibrante y saludable.</sev-cell>
+            <sev-cell col="j" num="23" sym="Ex" nam="Éxtasis">Representa la cima absoluta de la experiencia emocional, donde el individuo se funde en un asombro y un júbilo desbordantes. Nos saca de nuestros propios límites terrenales, ofreciéndonos vislumbres de una trascendencia casi mística y transformadora. Es un instante fugaz, pero posee el poder perdurable de redefinir nuestra percepción de la existencia.</sev-cell>
+            <sev-cell col="ma" num="24" sym="Ir" nam="Ira">Emerge como un fuego intenso y abrasador ante la percepción de un daño o una injusticia que consideramos intolerable. Puede consumirnos y destruir todo lo que nos rodea si permitimos ciegamente que tome el control de nuestras acciones. Sin embargo, su energía primordial, si se doma con sabiduría, puede defender límites y forjar rectitud.</sev-cell>
+            <sev-cell col="a" num="25" sym="Rn" nam="Rencor">Es el veneno insidioso que tomamos esperando que el otro perezca; una herida abierta que nos negamos obstinadamente a dejar cicatrizar. Nos ata con cadenas invisibles al pasado y a quienes nos hicieron daño, bloqueando nuestro propio avance. Liberarnos de él no es un regalo inmerecido para el ofensor, sino el acto supremo de misericordia hacia nosotros mismos.</sev-cell>
+            <sev-cell col="a" num="26" sym="Ho" nam="Hostilidad">Se manifiesta como una actitud sostenida de duro antagonismo y rechazo hacia nuestro entorno o hacia nuestros semejantes. Es un grueso muro defensivo erigido sobre los cimientos de la desconfianza o de un enojo profundo y no resuelto. Desarmarla requiere una valentía monumental para bajar la guardia y buscar un entendimiento genuino.</sev-cell>
+            <sev-cell col="s" num="27" sym="Sl" nam="Soledad">No es simplemente la ausencia física de compañía, sino la profunda y a veces dolorosa sensación de desconexión emocional. Puede ser un desierto árido que oprime el pecho, pero también un templo sagrado para el autodescubrimiento más íntimo. Es en el silencio profundo de la soledad donde, a menudo, encontramos nuestra voz más auténtica.</sev-cell>
+            <sev-cell col="s" num="28" sym="Dm" nam="Desamparo">Es la gélida sensación de vulnerabilidad extrema, donde nos sentimos desprovistos de todo refugio, guía y apoyo vital. Nos enfrenta a la abrumadora vastedad del mundo desde la conciencia de nuestra fragilidad más absoluta. Es precisamente en estos momentos de intemperie vital donde el abrazo solidario y la mano tendida recobran su valor incalculable.</sev-cell>
+            <sev-cell col="f" num="29" sym="Cf" nam="Confusión">Es la niebla espesa que desdibuja nuestras certezas más arraigadas y nos hace perder el rumbo temporalmente. Nos obliga a detener nuestro andar, pues comprendemos que los antiguos mapas ya no sirven para transitar el nuevo territorio. Aunque desorientadora, es el paso previo y necesario para alcanzar un nivel superior de claridad mental.</sev-cell>
+            <sev-cell col="f" num="30" sym="Rc" nam="Recelo">Actúa como un escudo de firme escepticismo ante intenciones ajenas que percibimos dudosas, ocultas o potencialmente peligrosas. Nos mantiene vigilantes, evaluando meticulosamente el terreno antes de conceder nuestra lealtad o nuestra apertura vulnerable. Es la prudencia llevada al extremo para salvaguardar nuestra integridad en un mundo de incertidumbres.</sev-cell>
+            <sev-cell col="f" num="31" sym="Su" nam="Sumisión">Es la rendición de nuestra propia voluntad ante la presencia de una autoridad, una circunstancia o un poder ineludiblemente superior. En ocasiones surge del temor paralizante, pero en otras es un acto consciente y maduro de humildad ante lo inevitable. Requiere un gran discernimiento para saber cuándo es sabio doblegarnos y cuándo es imperativo sostener nuestra dignidad.</sev-cell>
+            <sev-cell col="l" num="32" sym="Gr" nam="Gratitud">Es la memoria luminosa del corazón; el reconocimiento profundo de los dones, las oportunidades y el apoyo que se nos brinda. Transformar nuestra perspectiva, enfocándonos en lo que poseemos en lugar de lamentar lo que nos falta, multiplica exponencialmente nuestra alegría. Es el fundamento sólido sobre el que se edifica una actitud verdaderamente abundante y en paz con la vida.</sev-cell>
+            <sev-cell col="l" num="33" sym="Cn" nam="Confianza">Es el valiente salto de fe que damos hacia nuestros semejantes y hacia la solidez de nuestras propias capacidades. Nos permite tejer vínculos seguros y caminar por el mundo sin la pesada armadura del miedo constante. Tarda una vida entera en construirse con esmero, pero debemos recordar que es frágil como el cristal ante el embate de la traición.</sev-cell>
+            <sev-cell col="j" num="34" sym="En" nam="Entusiasmo">Es el "dios interior" que despierta; una fuerza arrolladora que nos impulsa a la acción con un fervor y una pasión inigualables. Hace que los mayores obstáculos parezcan pequeños e infunde vitalidad a todos los que cruzan nuestro camino. Es la chispa divina que tiene el poder de convertir el trabajo ordinario en una obra verdaderamente extraordinaria.</sev-cell>
+            <sev-cell col="j" num="35" sym="Av" nam="Alivio">Es el dulce suspiro del alma cuando una carga abrumadora es finalmente y definitivamente levantada de nuestros hombros cansados. Nos devuelve el aliento vital y la ligereza tras haber atravesado el oscuro umbral del estrés, la prueba o la extrema preocupación. Es la confirmación serena y esperanzadora de que la tempestad, por fin, ha quedado atrás.</sev-cell>
+            <sev-cell col="j" num="36" sym="Op" nam="Optimismo">Es la elección consciente y valerosa de buscar la luz incluso en los paisajes más sombríos y adversos de nuestra existencia. No niega ingenuamente la dificultad, pero confía firmemente en nuestra capacidad para superarla y en la promesa de un mañana mejor. Es la actitud inquebrantable que forja la resiliencia humana y mantiene vivo nuestro propósito de avanzar.</sev-cell>
+            <sev-cell col="a" num="37" sym="Od" nam="Odio">Es la aversión profunda y destructiva que corrompe irremediablemente el alma de aquel que consiente en albergarla. Nos ciega por completo ante la humanidad de nuestro prójimo, justificando la crueldad y perpetuando ciclos interminables de dolor. Erradicarlo de nuestro ser requiere un esfuerzo titánico de elevación moral y la voluntad inquebrantable de optar por el perdón.</sev-cell>
+            <sev-cell col="a" num="38" sym="Fr" nam="Frustración">Nace del choque brusco y doloroso entre nuestras elevadas expectativas y una terca realidad que se niega a ceder a nuestros deseos. Es un muro imponente que nos obliga a retroceder temporalmente, a replantear la estrategia y a cultivar el difícil arte de la paciencia. Si no permitimos que nos derrote, nos enseña de primera mano la invaluable virtud de la perseverancia.</sev-cell>
+            <sev-cell col="a" num="39" sym="Ic" nam="Incomprensión">Es el aislamiento desolador que se experimenta al hablar una verdad íntima que nadie más parece escuchar o validar. Nos hace sentir como extranjeros en nuestro propio entorno, llevándonos a dudar del valor de nuestra propia voz. Superar este oscuro abismo requiere tanto coraje para seguir comunicando nuestra esencia, como la esperanza de hallar empatía del otro lado.</sev-cell>
+            <sev-cell col="s" num="40" sym="Dn" nam="Desánimo">Es la profunda pérdida de vigor que nos invade cuando los continuos resultados adversos erosionan nuestra fe en un propósito superior. Convierte los pasos más sencillos en un esfuerzo titánico y desluce los objetivos que alguna vez brillaron con luz propia. Debe ser interpretado como un llamado a la pausa compasiva, al cuidado propio y a la necesaria reconexión con nuestras motivaciones fundamentales.</sev-cell>
+            <sev-cell col="s" num="41" sym="No" nam="Nostalgia">Es el anhelo agridulce por un tiempo pasado que sabemos irrepetible, teñido perpetuamente por el afecto cálido de la memoria. Nos recuerda que hemos vivido intensamente y que hemos amado profundamente a lo largo de nuestro accidentado camino. Es un hermoso puente hacia nuestro ayer que debemos transitar con suma gratitud, recordando siempre no quedarnos a vivir en él.</sev-cell>
+            <sev-cell col="f" num="42" sym="Te" nam="Terror">Es el miedo llevado a su paroxismo absoluto, una fuerza atávica que desborda y destroza cualquier intento de racionalización. Nos paraliza por completo ante lo macabro o lo inmensamente amenazador, desnudando sin piedad nuestra vulnerabilidad última frente al abismo. Es la experiencia humana más extrema, donde todo se reduce al imperativo primario de la supervivencia al límite.</sev-cell>
+            <sev-cell col="f" num="43" sym="Ve" nam="Verguenza">Es el doloroso e implacable juicio interno que surge cuando sentimos haber expuesto nuestras carencias o fallado rotundamente a nuestros propios ideales. Nos genera el deseo ardiente de desaparecer y ocultarnos para siempre de la mirada inquisidora y severa del mundo. Sanar esta herida profunda requiere el coraje inmenso de abrazar nuestra imperfección y tratarnos con infinita compasión.</sev-cell>
+            <sev-cell col="md" num="44" sym="As" nam="Asco">Es el rechazo visceral, tanto físico como moral, ante aquello que instintivamente sentimos que amenaza nuestra pureza, salud o integridad. Actúa como un fiel guardián primitivo que nos aleja de la toxicidad y la decadencia en todas sus formas posibles. Es una frontera emocional clara e innegociable que define tajantemente lo que consideramos inaceptable para nuestro espíritu.</sev-cell>
+            <sev-cell col="l" num="45" sym="Ad" nam="Admiración">Es la contemplación respetuosa, profunda y elevada de las virtudes, el talento excepcional o el espíritu de grandeza en otro ser humano. Nos inspira a elevar nuestros propios estándares, actuando como un faro que ilumina lo que nosotros mismos podríamos llegar a ser. Es un tributo sumamente noble que engrandece en igual medida tanto a quien lo recibe con humildad como a quien lo profesa con sinceridad.</sev-cell>
+            <sev-cell col="l" num="46" sym="Or" nam="Orgullo">En su justa y equilibrada medida, es la digna valoración de nuestros propios méritos y de las raíces históricas que nos sostienen. Nos otorga la integridad necesaria para mantenernos firmes en nuestras convicciones más profundas y defender nuestros logros. Sin embargo, advertimos que, si se desborda en arrogancia, se convierte rápidamente en el muro que nos aísla de la empatía ajena.</sev-cell>
+            <sev-cell col="j" num="47" sym="Eu" nam="Euforia">Es un estado de exaltación suprema y embriagadora donde la alegría y la energía vital parecen carecer por completo de límites. Nos eleva drásticamente por encima de lo terrenal, otorgándonos una sensación temporal de invencibilidad y plenitud absoluta. Como toda llamarada excepcionalmente intensa, su naturaleza es fugaz, enseñándonos a atesorar profundamente los picos de nuestra existencia.</sev-cell>
+            <sev-cell col="j" num="48" sym="De" nam="Deseo">Es la tensión ardiente y magnética que nos impulsa inexorablemente hacia aquello que anhelamos poseer, experimentar o conquistar. Actúa como el motor primitivo y fundamental de nuestras ambiciones, nuestras relaciones y del propio instinto vital que nos mueve. Comprender y encauzar sabiamente esta poderosa fuerza es la clave para no convertirnos en esclavos de nuestra propia sed inagotable.</sev-cell>
+            <sev-cell col="j" num="49" sym="Fe" nam="Felicidad">Más que un instante pasajero de júbilo, es un estado profundo, estable y duradero de bienestar, aceptación y paz con la vida misma. Representa el arte maestro de florecer en el presente, abrazando con gracia tanto las luces radiantes como las sombras inevitables de nuestro camino. Es el destino último y universal que todos buscamos con ahínco, pero que, paradójicamente, solo se halla en la forma misma de caminar.</sev-cell>
+            <sev-cell col="a" num="50" sym="Ra" nam="Rabia">Es la expresión explosiva, cruda y menos controlada del enojo, un verdadero huracán emocional que exige de nosotros una acción inmediata. Desgarra sin contemplaciones los filtros sociales, buscando restituir un equilibrio roto o destruir aquello que nos agrede. Reconocerla a tiempo y sin temor es vital para poder transformar su aterrador poder destructivo en una asertividad firme y constructiva.</sev-cell>
+            <sev-cell col="a" num="51" sym="Ce" nam="Celos">Son la dolorosa punzada de temor y posesividad que surge ante la percibida amenaza de perder un afecto vital o una posición frente a un tercero. Más que revelar las intenciones ajenas, son espejos que nos exponen nuestras propias inseguridades más profundas y el miedo atávico al abandono. Manejarlos con madurez exige una honestidad brutal con nosotros mismos y cultivar una confianza sólida en quienes afirmamos amar.</sev-cell>
+            <sev-cell col="a" num="52" sym="Ev" nam="Envidia">Es la sombra dolorosa y silenciosa que proyectamos cuando el éxito resplandeciente o los bienes ajenos nos recuerdan crudamente nuestras propias carencias. Nos desgasta el espíritu al obligarnos a enfocar nuestra preciosa energía en lo que posee el vecino en lugar de regar y cultivar nuestro propio jardín. Transformarla en un sentimiento noble requiere la madurez excepcional de inspirarnos en el éxito del otro en vez de resentirlo amargamente.</sev-cell>
+            <sev-cell col="a" num="53" sym="Sb" nam="Soberbia">Es el peligroso espejismo de superioridad que nos desconecta trágicamente de nuestra intrínseca e innegable igualdad con el resto de la humanidad. Nos sube a un frágil pedestal desde el cual se vuelve imposible mirar a nadie a los ojos, obligándonos a mirar solo por encima del hombro. La historia nos enseña que a menudo antecede a las más estrepitosas caídas, pues ciega nuestra capacidad de autocrítica y desestima el incalculable valor del buen consejo.</sev-cell>
+            <sev-cell col="s" num="54" sym="Cu" nam="Culpa">Es el peso implacable y aleccionador que recae sobre la conciencia al reconocer, con pesar, que hemos transgredido nuestros propios valores éticos. Actúa como un estricto juez interior que clama incansablemente por reparación, por disculpas sinceras y por la rectificación de nuestras acciones equivocadas. Cuando se procesa sanamente, nos empuja a enmendar el daño; pero cuando se vuelve tóxica, nos condena inútilmente a un castigo perpetuo.</sev-cell>
+            <sev-cell col="s" num="55" sym="Re" nam="Resignación">Es la aceptación sosegada o, a veces, derrotada ante una realidad inalterable y contundente que debemos acatar sin mayor resistencia. Supone el acto difícil de deponer las armas cuando comprendemos que la lucha ya no tiene sentido, decidiendo ahorrar nuestras energías para batallas que sí podemos ganar. Aunque a menudo viene acompañada de dolor, es el preludio absolutamente necesario para cerrar un capítulo y permitirnos mirar hacia un nuevo y esperanzador horizonte.</sev-cell>
+            <sev-cell col="s" num="56" sym="Me" nam="Melancolia">Es un estado poético y brumoso de tristeza suave, una ensoñación reflexiva sobre lo efímero de la condición humana y el paso inexorable del tiempo. A diferencia del dolor agudo, no busca consuelo urgente, sino que se recrea con calma en la extraña belleza de lo que está ausente o es intangible. Es la musa silenciosa y fiel de pensadores, creadores y artistas que han aprendido a encontrar una luz única en medio de la niebla.</sev-cell>
+            <sev-cell col="d" num="57" sym="Ds" nam="Desprecio">Es la mirada gélida y despiadada que despoja al otro de su valor inherente y su dignidad humana, considerándolo como algo inferior o indigno de todo respeto. Es, quizás, el veneno más corrosivo y destructivo para cualquier vínculo humano, pues clausura violentamente toda posibilidad de diálogo y entendimiento. Quien se permite ejercerlo se empobrece moral y espiritualmente, creyendo en su error que tal actitud logra enaltecerlo.</sev-cell>
+            <div id="legend">
+                <div>
+                    <div style="background: linear-gradient(to right, var(--ml) 0%, var(--ml) 50%, var(--l) 50%, var(--l) 100%)"></div>
+                    <span>Amor</span>
+                </div>
+                <div>
+                    <div style="background: linear-gradient(to right, var(--mj) 0%, var(--mj) 50%, var(--j) 50%, var(--j) 100%)"></div>
+                    <span>Alegría</span>
+                </div>
+                <div>
+                    <div style="background: linear-gradient(to right, var(--msu) 0%, var(--msu) 50%, var(--su) 50%, var(--su) 100%)"></div>
+                    <span>Sorpresa</span>
+                </div>
+                <div>
+                    <div style="background: linear-gradient(to right, var(--ma) 0%, var(--ma) 50%, var(--a) 50%, var(--a) 100%)"></div>
+                    <span>Ira</span>
+                </div>
+                <div>
+                    <div style="background: linear-gradient(to right, var(--ms) 0%, var(--ms) 50%, var(--s) 50%, var(--s) 100%)"></div>
+                    <span>Tristeza</span>
+                </div>
+                <div>
+                    <div style="background: linear-gradient(to right, var(--mf) 0%, var(--mf) 50%, var(--f) 50%, var(--f) 100%)"></div>
+                    <span>Miedo</span>
+                </div>
+                <div>
+                    <div style="background: linear-gradient(to right, var(--md) 0%, var(--md) 50%, var(--d) 50%, var(--d) 100%)"></div>
+                    <span>Asco</span>
+                </div>
+            </div>
+            <sev-cell col="s" num="58" sym="Dc" nam="Decepción">Es el vacío abrupto, frío y paralizante que se instala en el pecho cuando alguien o algo en quien confiábamos ciegamente no logra estar a la altura de lo esperado. Rompe en mil pedazos el frágil cristal de la ilusión que habíamos construido y nos enfrenta, de golpe, a la debilidad de las promesas humanas. Procesarla adecuadamente requiere reajustar nuestra visión idealizada del mundo y aprender la difícil tarea de perdonar la imperfección inherente a los demás.</sev-cell>
+            <sev-cell col="s" num="59" sym="Ha" nam="Hastio">Es el cansancio profundo, crónico y abrumador del alma frente a la repetición monótona, predecible y carente de sentido de los días. Apaga lentamente el interés vital que nos mueve, convirtiendo el milagro de la existencia en un peso inerte que simplemente se arrastra en lugar de vivirse con pasión. Romper este ciclo sofocante demanda un giro radical en nuestra perspectiva, la búsqueda imperiosa y valiente de un nuevo propósito o de una fuente renovada de asombro.</sev-cell>
+            <sev-cell col="s" num="60" sym="Pe" nam="Pesimismo">Es el lente ensombrecido y constante a través del cual el futuro se vislumbra siempre cuesta arriba, plagado de amenazas y lleno de inevitables infortunios. Nos prepara psicológicamente para el peor de los escenarios como un mecanismo de defensa ante posibles desengaños, pero al hacerlo, nos roba implacablemente la alegría y la esperanza del presente. Aunque en pequeñas dosis puede otorgar una útil cautela, requiere ser contrarrestado activamente para no asfixiar nuestra innata capacidad creadora y transformadora.</sev-cell>
+        </div>
+    </div>
+</body>
+
+</html>
